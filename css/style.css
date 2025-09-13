@@ -591,6 +591,9 @@ textarea:focus {
   -webkit-box-align: center;
   -webkit-align-items: center;
           align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
   height: 39px;
   padding-top: 0;
   padding-bottom: 0;
@@ -606,6 +609,7 @@ textarea:focus {
   -webkit-transition-duration: 0.3s;
   transition-duration: 0.3s;
   cursor: pointer;
+  line-height: 1;
 }
 
 .login-link::before {
