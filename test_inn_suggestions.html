@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест подсказок ИНН</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-container { max-width: 600px; margin: 0 auto; }
+        .field { margin: 20px 0; }
+        .field input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .suggestions { border: 1px solid #ccc; border-top: none; max-height: 200px; overflow-y: auto; }
+        .suggestions li { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .suggestions li:hover { background-color: #f5f5f5; }
+        .suggestions li:last-child { border-bottom: none; }
+        .status { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .status.success { background-color: #d4edda; color: #155724; }
+        .status.error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Тест подсказок ИНН</h1>
+        
+        <div class="field">
+            <label>Введите ИНН или название организации:</label>
+            <input type="text" id="inn-input" placeholder="Начните вводить ИНН или название...">
+            <ul class="suggestions" id="suggestions" style="display: none;"></ul>
+        </div>
+        
+        <div id="status"></div>
+        
+        <div class="field">
+            <h3>Отладочная информация:</h3>
+            <div id="debug"></div>
+        </div>
+    </div>
+
+    <script>
+        // Имитируем window.AUTH_TOKEN для тестирования
+        window.AUTH_TOKEN = 'test-token';
+        
+        // Загружаем API класс
+        class API {
+            constructor() {
+                this.baseURL = 'https://portaldata.ru/api/v1';
+            }
+
+            async getDadataInns(query) {
+                try {
+                    console.log('🔍 Запрос подсказок для:', query);
+                    const response = await fetch(`https://api.ostk.ru/hint/dada.php?q=${query}&type=company`);
+                    const data = await response.json();
+                    console.log('📋 Получены подсказки:', data);
+                    return data.suggestions;
+                } catch (error) {
+                    console.error('❌ Ошибка получения подсказок ИНН:', error);
+                    throw error;
+                }
+            }
+        }
+
+        // Создаем глобальный экземпляр API
+        window.api = new API();
+
+        // Функция отображения подсказок
+        function renderSuggestions(container, suggestions, query) {
+            container.innerHTML = '';
+            
+            if (!suggestions || suggestions.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            suggestions.forEach(sg => {
+                const sg_el = document.createElement('li');
+                let text = `${sg.data.inn || ''} ${sg.value || ''}`;
+                
+                sg_el.innerHTML = text.replace(new RegExp(query, 'gi'), match => `<span style="background-color: yellow;">${match}</span>`);
+                sg_el.setAttribute('data-inn', sg.data.inn);
+                sg_el.addEventListener('click', () => {
+                    document.getElementById('inn-input').value = sg.data.inn;
+                    container.style.display = 'none';
+                    showStatus(`Выбран ИНН: ${sg.data.inn}`, 'success');
+                });
+
+                container.appendChild(sg_el);
+            });
+            
+            container.style.display = 'block';
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+
+        function showDebug(message) {
+            const debug = document.getElementById('debug');
+            debug.innerHTML += `<div>${new Date().toLocaleTimeString()}: ${message}</div>`;
+        }
+
+        // Обработчик ввода
+        document.getElementById('inn-input').addEventListener('input', async function(e) {
+            const query = e.target.value.trim();
+            const suggestionsContainer = document.getElementById('suggestions');
+            
+            showDebug(`Ввод: "${query}"`);
+            
+            if (query.length >= 3) {
+                try {
+                    showStatus('Загрузка подсказок...', 'success');
+                    const suggestions = await window.api.getDadataInns(query);
+                    renderSuggestions(suggestionsContainer, suggestions, query);
+                    showStatus(`Найдено ${suggestions.length} подсказок`, 'success');
+                    showDebug(`Получено ${suggestions.length} подсказок`);
+                } catch (error) {
+                    showStatus(`Ошибка: ${error.message}`, 'error');
+                    showDebug(`Ошибка: ${error.message}`);
+                    suggestionsContainer.style.display = 'none';
+                }
+            } else {
+                suggestionsContainer.style.display = 'none';
+                showStatus('Введите минимум 3 символа', 'error');
+            }
+        });
+
+        // Скрываем подсказки при клике вне поля
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.field')) {
+                document.getElementById('suggestions').style.display = 'none';
+            }
+        });
+
+        showDebug('Тестовая страница загружена');
+    </script>
+</body>
+</html>
+
+

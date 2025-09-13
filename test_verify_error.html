@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест обработки ошибок верификации</title>
+    <script>
+        // Имитируем объект ERRORS из main.js
+        const ERRORS = {
+            'user_exists': 'Пользователь с такой почтой уже существует',
+            'account_already_verified': 'Почта аккаунта уже верифицирована',
+            'Недействительный или истекший токен': 'Токен верификации недействителен или истек. Пожалуйста, запросите новое письмо подтверждения.',
+        };
+
+        // Имитируем функцию verifyUser
+        async function testVerifyUser(token) {
+            console.log('🔍 Тестируем токен:', token);
+            
+            try {
+                const resp = await fetch('https://portaldata.ru/api/v1/user/verify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await resp.json();
+                console.log('📡 Ответ от API:', data);
+
+                if (data.code === 200) {
+                    console.log('✅ Успех:', data.message);
+                    return { success: true, message: data.message };
+                } else if (data.code === 310) {
+                    const errorMessage = ERRORS[data.message] || 'Неизвестная ошибка. Повторите позже';
+                    console.log('❌ Ошибка:', errorMessage);
+                    return { success: false, message: errorMessage, code: data.code };
+                }
+            } catch (error) {
+                console.error('🚨 Ошибка запроса:', error);
+                return { success: false, message: 'Ошибка сети: ' + error.message };
+            }
+        }
+
+        // Тестируем разные сценарии
+        async function runTests() {
+            console.log('🧪 Запуск тестов верификации...');
+            
+            // Тест 1: Недействительный токен
+            console.log('\n--- Тест 1: Недействительный токен ---');
+            const result1 = await testVerifyUser('invalid_token');
+            document.getElementById('test1-result').textContent = JSON.stringify(result1, null, 2);
+            
+            // Тест 2: Действительный токен (если есть)
+            console.log('\n--- Тест 2: Действительный токен ---');
+            const result2 = await testVerifyUser('71994fe091f766ebf095ccc7480a5b52cfc8bbf8e2104d9f89daa4d6fd2cd01c');
+            document.getElementById('test2-result').textContent = JSON.stringify(result2, null, 2);
+        }
+    </script>
+</head>
+<body>
+    <h1>Тест обработки ошибок верификации</h1>
+    
+    <h2>Тест 1: Недействительный токен</h2>
+    <pre id="test1-result">Ожидание результата...</pre>
+    
+    <h2>Тест 2: Действительный токен</h2>
+    <pre id="test2-result">Ожидание результата...</pre>
+    
+    <button onclick="runTests()">Запустить тесты</button>
+    
+    <script>
+        // Автоматически запускаем тесты при загрузке
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+</html>

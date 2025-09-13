@@ -1,0 +1,422 @@
+openapi: 3.0.0
+info:
+  title: API ПорталДанных.РФ
+  version: '1.0'
+  description: |
+    Документация к REST API для регистрации, аутентификации, управления ИНН и получения API-ключа.
+servers:
+  - url: https://api.portaldata.ru/v2
+paths:
+  /:
+    get:
+      summary: Проверка работоспособности API
+      description: Возвращает строку "API is working" для проверки доступности сервера.
+      responses:
+        '200':
+          description: API работает
+          content:
+            text/plain:
+              example: API is working
+
+  /register:
+    post:
+      summary: Регистрация пользователя
+      description: |
+        Регистрирует нового пользователя. После регистрации на email отправляется письмо для подтверждения.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Имя пользователя
+                email:
+                  type: string
+                  format: email
+                  description: Email пользователя
+                password:
+                  type: string
+                  minLength: 6
+                  description: Пароль (не менее 6 символов)
+                referrer_id:
+                  type: integer
+                  nullable: true
+                  description: ID пригласившего пользователя (опционально)
+                referral_code:
+                  type: string
+                  nullable: true
+                  description: Email пригласившего (опционально)
+              required: [username, email, password]
+            example:
+              username: ivan123
+              email: ivan@example.com
+              password: mySecret123
+              referrer_id: 5
+      responses:
+        '200':
+          description: Успешная регистрация
+          content:
+            application/json:
+              example:
+                success: true
+                mail_result: "OK"
+                referrer_id: 5
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              example:
+                error: "Invalid email, password or username"
+        '409':
+          description: Email уже зарегистрирован
+          content:
+            application/json:
+              example:
+                error: "Email already registered"
+
+  /confirm:
+    get:
+      summary: Подтверждение email
+      description: Подтверждает email пользователя по коду из письма.
+      parameters:
+        - in: query
+          name: code
+          schema: { type: string }
+          required: true
+          description: Код подтверждения из письма
+      responses:
+        '200':
+          description: Email успешно подтвержден
+          content:
+            text/plain:
+              example: Email confirmed! Теперь вы можете войти.
+        '400':
+          description: Некорректный или просроченный код
+          content:
+            text/plain:
+              example: Invalid or expired confirmation link
+
+  /login:
+    post:
+      summary: Вход пользователя
+      description: Аутентификация по email и паролю. Возвращает JWT-токен при успехе.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email, description: Email }
+                password: { type: string, description: Пароль }
+              required: [email, password]
+            example:
+              email: ivan@example.com
+              password: mySecret123
+      responses:
+        '200':
+          description: Успешный вход
+          content:
+            application/json:
+              example:
+                token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              example:
+                error: "Invalid email or password"
+        '401':
+          description: Неверные учетные данные
+          content:
+            application/json:
+              example:
+                error: "Invalid credentials"
+        '403':
+          description: Email не подтвержден
+          content:
+            application/json:
+              example:
+                error: "Email not confirmed"
+
+  /forgot-password:
+    post:
+      summary: Запрос на восстановление пароля
+      description: Отправляет письмо для сброса пароля на указанный email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email, description: Email }
+              required: [email]
+            example:
+              email: ivan@example.com
+      responses:
+        '200':
+          description: Письмо отправлено (или email не найден)
+          content:
+            application/json:
+              example:
+                success: true
+                mail: "OK"
+
+  /reset-password:
+    post:
+      summary: Сброс пароля
+      description: Сброс пароля по коду из письма.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email, description: Email }
+                code: { type: string, description: Код из письма }
+                password: { type: string, description: Новый пароль }
+              required: [email, code, password]
+            example:
+              email: ivan@example.com
+              code: "abcdef123456"
+              password: newSecret123
+      responses:
+        '200':
+          description: Пароль успешно сброшен
+          content:
+            application/json:
+              example:
+                success: true
+        '400':
+          description: Некорректные данные или код
+          content:
+            application/json:
+              example:
+                error: "Invalid code"
+
+  /resend-confirm:
+    post:
+      summary: Повторная отправка письма подтверждения
+      description: Отправляет письмо для подтверждения email повторно.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email: { type: string, format: email, description: Email }
+              required: [email]
+            example:
+              email: ivan@example.com
+      responses:
+        '200':
+          description: Письмо отправлено
+          content:
+            application/json:
+              example:
+                success: true
+                mail_result: "OK"
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              example:
+                error: "User not found"
+        '409':
+          description: Email уже подтвержден
+          content:
+            application/json:
+              example:
+                error: "Email already confirmed"
+
+  /add-inn:
+    post:
+      summary: Добавить ИНН пользователю
+      description: Добавляет ИНН текущему пользователю (требуется JWT).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inn: { type: string, description: ИНН }
+              required: [inn]
+            example:
+              inn: "7707083893"
+      responses:
+        '200':
+          description: ИНН добавлен
+          content:
+            application/json:
+              example:
+                success: true
+        '400':
+          description: Некорректный ИНН
+          content:
+            application/json:
+              example:
+                error: "Invalid INN"
+        '401':
+          description: Неавторизован
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+        '409':
+          description: ИНН уже добавлен
+          content:
+            application/json:
+              example:
+                error: "INN already added"
+
+  /my-inns:
+    get:
+      summary: Получить свои ИНН
+      description: Возвращает список ИНН пользователя (требуется JWT).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список ИНН пользователя
+          content:
+            application/json:
+              example:
+                inns:
+                  - id: 1
+                    user_id: 10
+                    inn: "7707083893"
+                    status: "pending"
+                  - id: 2
+                    user_id: 10
+                    inn: "1234567890"
+                    status: "approved"
+        '401':
+          description: Неавторизован
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+
+  /pending-inns:
+    get:
+      summary: Получить все ожидающие подтверждения ИНН (admin)
+      description: Только для администратора. Возвращает список ИНН со статусом pending.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список pending ИНН
+          content:
+            application/json:
+              example:
+                inns:
+                  - id: 3
+                    user_id: 11
+                    inn: "9876543210"
+                    status: "pending"
+        '403':
+          description: Нет доступа
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+
+  /approve-inn:
+    post:
+      summary: Подтвердить ИНН (admin)
+      description: Подтверждает ИНН по id (только для администратора).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inn_id: { type: integer, description: ID ИНН }
+              required: [inn_id]
+            example:
+              inn_id: 3
+      responses:
+        '200':
+          description: ИНН подтвержден
+          content:
+            application/json:
+              example:
+                success: true
+        '403':
+          description: Нет доступа
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+
+  /reject-inn:
+    post:
+      summary: Отклонить ИНН (admin)
+      description: Отклоняет ИНН по id с комментарием (только для администратора).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                inn_id: { type: integer, description: ID ИНН }
+                comment: { type: string, description: Комментарий }
+              required: [inn_id, comment]
+            example:
+              inn_id: 3
+              comment: "ИНН не найден в базе ФНС"
+      responses:
+        '200':
+          description: ИНН отклонён
+          content:
+            application/json:
+              example:
+                success: true
+        '403':
+          description: Нет доступа
+          content:
+            application/json:
+              example:
+                error: "Forbidden"
+
+  /get-api-key:
+    get:
+      summary: Получить API-ключ
+      description: Возвращает API-ключ для текущего пользователя (по JWT).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: API-ключ
+          content:
+            application/json:
+              example:
+                api_key: "aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899"
+        '401':
+          description: Неавторизован
+          content:
+            application/json:
+              example:
+                error: "Unauthorized"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест генерации PDF счетов</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .field { margin: 15px 0; }
+        .field label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .field input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin: 10px 5px; }
+        .btn:hover { background: #0056b3; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .result { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        .error { color: red; }
+        .success { color: green; }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .spinner { animation: spin 1s linear infinite; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест генерации PDF счетов</h1>
+        
+        <div class="field">
+            <label for="inn">ИНН организации или ИП:</label>
+            <input type="text" id="inn" placeholder="Введите ИНН (10 или 12 цифр)" value="7449006730">
+        </div>
+        
+        <div class="field">
+            <label for="email">Email пользователя:</label>
+            <input type="email" id="email" placeholder="Введите email" value="demonco@yandex.ru">
+        </div>
+        
+        <div class="field">
+            <label for="token">JWT токен:</label>
+            <input type="text" id="token" placeholder="Введите JWT токен" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NTc3NDg4MTEsImlhdCI6MTc1Nzc0NzkxMSwidHlwZSI6ImFjY2VzcyIsInVzZXJfaWQiOjV9._H7ONqYNQkUJeKjz9KgdFb9FlqxRo3eaNOAHpXFntbo">
+        </div>
+        
+        <button id="generate-pdf-btn" class="btn">Сгенерировать PDF счет</button>
+        <button id="generate-html-btn" class="btn">Просмотреть HTML счет</button>
+        
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        document.getElementById('generate-pdf-btn').addEventListener('click', async function() {
+            const inn = document.getElementById('inn').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const token = document.getElementById('token').value.trim();
+            const result = document.getElementById('result');
+            const btn = this;
+            
+            if (!inn || !/^\d{10,12}$/.test(inn)) {
+                result.innerHTML = '<span class="error">Пожалуйста, укажите корректный ИНН (10 или 12 цифр).</span>';
+                result.style.display = 'block';
+                return;
+            }
+            
+            if (!email) {
+                result.innerHTML = '<span class="error">Пожалуйста, укажите email.</span>';
+                result.style.display = 'block';
+                return;
+            }
+            
+            if (!token) {
+                result.innerHTML = '<span class="error">Пожалуйста, укажите JWT токен.</span>';
+                result.style.display = 'block';
+                return;
+            }
+            
+            // Показываем индикатор загрузки
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner">⟳</span> Генерация PDF...';
+            result.style.display = 'none';
+            
+            try {
+                const pdfUrl = `https://portaldata.ru/api/buh/makeinvoice?inn=${encodeURIComponent(inn)}&email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
+                
+                // Создаем ссылку для скачивания
+                const downloadLink = document.createElement('a');
+                downloadLink.href = pdfUrl;
+                downloadLink.download = `invoice_${inn}_${new Date().toISOString().slice(0,10)}.pdf`;
+                downloadLink.target = '_blank';
+                downloadLink.className = 'btn';
+                downloadLink.innerHTML = '📄 Скачать PDF счет';
+                
+                result.innerHTML = '<span class="success">PDF счет успешно сгенерирован!</span><br><br>';
+                result.appendChild(downloadLink);
+                result.style.display = 'block';
+                
+                // Автоматически скачиваем PDF
+                downloadLink.click();
+                
+            } catch (error) {
+                result.innerHTML = `<span class="error">Ошибка генерации PDF: ${error.message}</span>`;
+                result.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Сгенерировать PDF счет';
+            }
+        });
+        
+        document.getElementById('generate-html-btn').addEventListener('click', async function() {
+            const inn = document.getElementById('inn').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const token = document.getElementById('token').value.trim();
+            const result = document.getElementById('result');
+            const btn = this;
+            
+            if (!inn || !/^\d{10,12}$/.test(inn)) {
+                result.innerHTML = '<span class="error">Пожалуйста, укажите корректный ИНН (10 или 12 цифр).</span>';
+                result.style.display = 'block';
+                return;
+            }
+            
+            if (!email) {
+                result.innerHTML = '<span class="error">Пожалуйста, укажите email.</span>';
+                result.style.display = 'block';
+                return;
+            }
+            
+            if (!token) {
+                result.innerHTML = '<span class="error">Пожалуйста, укажите JWT токен.</span>';
+                result.style.display = 'block';
+                return;
+            }
+            
+            // Показываем индикатор загрузки
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner">⟳</span> Загрузка HTML...';
+            result.style.display = 'none';
+            
+            try {
+                const htmlUrl = `https://portaldata.ru/api/buh/makeinvoice.html?inn=${encodeURIComponent(inn)}&email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
+                
+                // Открываем HTML в новом окне
+                window.open(htmlUrl, '_blank');
+                
+                result.innerHTML = '<span class="success">HTML счет открыт в новом окне!</span>';
+                result.style.display = 'block';
+                
+            } catch (error) {
+                result.innerHTML = `<span class="error">Ошибка загрузки HTML: ${error.message}</span>`;
+                result.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Просмотреть HTML счет';
+            }
+        });
+    </script>
+</body>
+</html>

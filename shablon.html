@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Портал Данных</title>
+	<meta name="description" content="Портал Данных" />
+
+	<link rel="stylesheet" href="./libs/swiper.min.css">
+	<link rel="stylesheet" href="./css/style.css" />
+	<link rel="stylesheet" href="./css/h-style.css" />
+
+	<link rel="apple-touch-icon" sizes="180x180" href="./img/favicons/apple-touch-icon.png" />
+	<link rel="icon" type="image/png" sizes="32x32" href="./img/favicons/favicon-32x32.png" />
+	<link rel="icon" type="image/png" sizes="16x16" href="./img/favicons/favicon-16x16.png" />
+	<link rel="manifest" href="./img/favicons/site.webmanifest" />
+	<link rel="mask-icon" href="./img/favicons/safari-pinned-tab.svg" color="#3e6470" />
+	<meta name="msapplication-TileColor" content="#ffffff" />
+	<meta name="theme-color" content="#ffffff" />
+</head>
+
+<body class="body">
+	<div class="wrapper">
+		<header class="header">
+			<div class="header__inner _container">
+				<a href="#" class="logo-box header__logo">
+					<img src="./img/logo.svg" alt="logo" />
+				</a>
+
+				<ul class="navigate">
+					<li class="dropdown-link">
+						<a href="">Продукты</a>
+						<ul class="dropdown-list">
+							<li>
+								<a href="#">Продукт 1</a>
+							</li>
+							<li>
+								<a href="#">Продукт 2</a>
+							</li>
+							<li>
+								<a href="#">Продукт 3</a>
+							</li>
+						</ul>
+					</li>
+					<li><a href="">API</a></li>
+					<li><a href="">Цены</a></li>
+					<li><a href="">Блог</a></li>
+					<li><a href="">Партнеры</a></li>
+					<li><a href="">Поддержка</a></li>
+				</ul>
+
+				<div class="header-right">
+					<button class="login-link" type="button" data-popup="login-popup">Войти в сервис</button>
+
+					<button class="header__burger" type="button" aria-label="Мобильное меню">
+						<span></span>
+					</button>
+				</div>
+			</div>
+		</header>
+
+		<main class="main">
+			<section class="hero-section">
+				<div class="hero-section__inner _container">
+					<div class="hero-left-box">
+						<h1 class="hero-header">Портал данных - для торговли, кооперации, инвестиций</h1>
+
+						<img class="hero-icon" src="./img/ok-icon.svg" alt="i" />
+
+						<a href="#" class="plug-link btn">Подключиться</a>
+					</div>
+
+					<div class="hero-right-box">
+						<p>Сервис ПорталДанных.РФ на уровне метаданных автоматически соединяет информацию о потребностях покупателей с предложениями поставщиков.</p>
+
+						<p>Еще никогда поиск клиентов и поставщиков не был таким простым и быстрым.</p>
+					</div>
+				</div>
+			</section>
+
+			<section class="integration-section">
+				<div class="_container">
+					<div class="integration-section__left">
+						<h2 class="integration-header">API интеграция в полном объеме</h2>
+						<div class="integration-section__bottom">
+							<p>
+								Вы можете подключить сервис к любым своим системам: веб-сайту, мобильному <br />
+								приложению, боту, CRM, SRM, ERP, 1С продуктам и т.д.
+							</p>
+							<div class="tabs-box">
+								<a href="#" class="tab-link">Товары</a>
+								<a href="#" class="tab-link">Недвижимость</a>
+								<a href="#" class="tab-link">Отели и гостиницы</a>
+								<a href="#" class="tab-link">Проектирование</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="integration-section__right">
+						<img class="integration-icon" src="./img/gear-icon.svg" alt="i" />
+					</div>
+				</div>
+			</section>
+
+			<section class="address section-pt-sm section-pb">
+				<div class="_container">
+					<h2 class="section-sm-title">Адреса</h2>
+					<p class="address__subtitle">API работы с почтовыми адресами и геокоординатами.</p>
+					<div class="address__slider">
+						<div class="swiper">
+							<div class="swiper-wrapper">
+								<div class="address__slide swiper-slide">
+									<h3 class="address__name">Разбор адреса из строки («стандартизация»)</h3>
+									<p class="address__descr">Разбивает адрес из строки по отдельным полям (регион, город, улица, дом, квартира) согласно КЛАДР / ФИАС (ГАР). Определяет почтовый индекс, часовой пояс...</p>
+									<a href="#" class="address__btn primary-btn">Подробнее <img src="./img/arr-right.svg" alt="" width="14" height="14"></a>
+								</div>
+								<div class="address__slide swiper-slide">
+									<h3 class="address__name">Автодополнение при вводе («подсказки»)</h3>
+									<p class="address__descr">Помогает человеку быстро ввести корректный адрес на веб-форме или в приложении.</p>
+									<a href="#" class="address__btn primary-btn">Подробнее <img src="./img/arr-right.svg" alt="" width="14" height="14"></a>
+								</div>
+								<div class="address__slide swiper-slide">
+									<h3 class="address__name">Геокодирование</h3>
+									<p class="address__descr">Определяет координаты по адресу из строки. Заодно возвращает почтовый индекс и вообще все данные по адресу.</p>
+									<a href="#" class="address__btn primary-btn">Подробнее <img src="./img/arr-right.svg" alt="" width="14" height="14"></a>
+								</div>
+								<div class="address__slide swiper-slide">
+									<h3 class="address__name">Обратное геокодирование</h3>
+									<p class="address__descr">Возвращает всю информацию об адресе по координатам. Работает для домов, улиц и городов.</p>
+									<a href="#" class="address__btn primary-btn">Подробнее <img src="./img/arr-right.svg" alt="" width="14" height="14"></a>
+								</div>
+							</div>
+						</div>
+
+						<button type="button" class="address-btn-prev">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left-icon lucide-chevron-left"><path d="m15 18-6-6 6-6"/></svg>
+						</button>
+						<button type="button" class="address-btn-next">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right-icon lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+						</button>
+					</div>
+				</div>
+			</section>
+			
+			<section class="inn section-pt section-pb">
+				<div class="_container">
+					<div class="inn__content">
+						<img src="./img/inn-icon.svg" alt="" class="inn__icon" width="148" height="148">
+						<h2 class="section-title">Компания по ИНН</h2>
+						<div class="inn__descr">Находит компанию или ИП по ИНН, КПП, ОГРН. Присылает сведения о бизнесе из государственных источников. Работает внутри CMS, CRM и приложений.</div>
+						<div class="inn__items">
+							<div class="inn__item">
+								<div class="inn__inn">ИНН 9724061893</div>
+								<div class="inn__ooo">ООО «Ветер Cпорт»</div>
+								<ul class="inn__chars">
+									<li class="inn__char">
+										<div class="inn__char_var">Статус</div>
+										<div class="inn__char_val">Действующая организация</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">Юр. адрес</div>
+										<div class="inn__char_val">121351, г Москва, ул Коцюбинского, д 4 стр 3, помещ 128</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">Основной вид деятельности</div>
+										<div class="inn__char_val">Производство спортивных костюмов, лыжных костюмов, купальных костюмов и прочей трикотажной или вязаной одежды (14.19.12)</div>
+									</li>
+								</ul>
+							</div>
+							<div class="inn__item">
+								<ul class="inn__chars">
+									<li class="inn__char">
+										<div class="inn__char_var">Генеральный директор</div>
+										<div class="inn__char_val">Авдеенко Егор Павлович, ИНН 772586146371</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">Учредители</div>
+										<div class="inn__char_val">Иванов Антон Анатольевич, ИНН 773131983956, 90.00% доля</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_val">ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "ЭЙЧ БИ ЭФ ЭС", ИНН 9714009735, 10.00% доля</div>
+									</li>
+								</ul>
+							</div>
+							<div class="inn__item">
+								<ul class="inn__chars">
+									<li class="inn__char">
+										<div class="inn__char_var">С/с численность</div>
+										<div class="inn__char_val">32 сотрудника</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">Уставн. капитал</div>
+										<div class="inn__char_val">100 000 ₽</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">Реестр МСП</div>
+										<div class="inn__char_val">Микропредприятие с 10.12.2021</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">Специальный налоговый режим</div>
+										<div class="inn__char_val">УСН</div>
+									</li>
+								</ul>
+							</div>
+							<div class="inn__item">
+								<ul class="inn__chars">
+									<li class="inn__char">
+										<div class="inn__char_var">Доходы</div>
+										<div class="inn__char_val">71 277 000 ₽</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">Расходы</div>
+										<div class="inn__char_val">55 019 000 ₽</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">Недоимки</div>
+										<div class="inn__char_val">1 000 ₽</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">Штрафы</div>
+										<div class="inn__char_val">1 000 ₽</div>
+									</li>
+								</ul>
+							</div>
+							<div class="inn__item">
+								<ul class="inn__chars">
+									<li class="inn__char">
+										<div class="inn__char_var">КПП</div>
+										<div class="inn__char_val">773101001</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">ОГРН</div>
+										<div class="inn__char_val">1217700533192</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">ОКАТО</div>
+										<div class="inn__char_val">45286590000</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">ОКТМО</div>
+										<div class="inn__char_val">45320000000</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">ОКПО</div>
+										<div class="inn__char_val">54610841</div>
+									</li>
+									<li class="inn__char">
+										<div class="inn__char_var">ОКОГУ</div>
+										<div class="inn__char_val">4210014</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+
+						<div class="inn__bottom">
+							<a href="#" class="inn__btn primary-btn">
+								Получить полную информацию 
+								<img src="./img/arr-right.svg" alt="" width="14" height="14">
+							</a>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="need section-pt-sm section-pb-sm">
+				<div class="_container">
+					<h2 class="section-sm-title">Кому пригодится</h2>
+					<div class="need__items">
+						<div class="need__item">
+							<div class="need__name">Интернет-магазину</div>
+							<ul class="need__list">
+								<li>Быстрый ввод адреса с индексом, районом и метро</li>
+								<li>Город посетителя по IP-адресу и адрес по координатам</li>
+								<li>Район города, ближайшее метро и координаты дома</li>
+								<li>Все страны мира</li>
+							</ul>
+							<a href="#" class="need__link">
+								<img src="./img/arr-right-primary.svg" alt="" width="14" height="14">
+								Подробнее
+							</a>
+						</div>
+						<div class="need__item">
+							<div class="need__name">Облачному B2B или B2C-сервису</div>
+							<ul class="need__list">
+								<li>Быстрый ввод ФИО, адреса и email</li>
+								<li>Гранулярный адрес с привязкой к ФИАС (ГАР)</li>
+								<li>Всё о юрлице по ИНН</li>
+								<li>Аффилированные компании</li>
+							</ul>
+							<a href="#" class="need__link">
+								<img src="./img/arr-right-primary.svg" alt="" width="14" height="14">
+								Подробнее
+							</a>
+						</div>
+						<div class="need__item">
+							<div class="need__name">Производителю или дистрибьютору</div>
+							<ul class="need__list">
+								<li>Единая база торговых точек из разрозненных отчётов</li>
+								<li>Аккуратные адреса с разбивкой по полям и привязкой к ФИАС (ГАР)</li>
+								<li>Пакетная обработка любых данных из Excel-файлов</li>
+							</ul>
+							<a href="#" class="need__link">
+								<img src="./img/arr-right-primary.svg" alt="" width="14" height="14">
+								Подробнее
+							</a>
+						</div>
+						<div class="need__item">
+							<div class="need__name">А ещё</div>
+							<ul class="need__links">
+								<li>
+									<a href="#" class="need__link">
+										<img src="./img/arr-right-primary.svg" alt="" width="14" height="14">
+										Кредитной организации
+									</a>
+								</li>
+								<li>
+									<a href="#" class="need__link">
+										<img src="./img/arr-right-primary.svg" alt="" width="14" height="14">
+										Коллекторскому агентству
+									</a>
+								</li>
+								<li>
+									<a href="#" class="need__link">
+										<img src="./img/arr-right-primary.svg" alt="" width="14" height="14">
+										Курьерской службе
+									</a>
+								</li>
+								<li>
+									<a href="#" class="need__link">
+										<img src="./img/arr-right-primary.svg" alt="" width="14" height="14">
+										Маркетологу
+									</a>
+								</li>
+								<li>
+									<a href="#" class="need__link">
+										<img src="./img/arr-right-primary.svg" alt="" width="14" height="14">
+										Разработчику
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</section>
+			
+			<section class="launching-soon-section">
+				<div class="_container">
+					<p class="launching-soon-title">СКОРО ЗАПУСК!</p>
+				</div>
+			</section>
+		</main>
+
+		<footer class="footer">
+			<div class="footer__inner _container">
+				<a href="#" class="logo-box footer__logo">
+					<img src="./img/logo-footer.svg" alt="logo" />
+				</a>
+
+				<div class="footer-nav-inner">
+					<ul class="navigation navigation-footer--one">
+						<li><a href="">Продукты</a></li>
+						<li><a href="">API</a></li>
+						<li><a href="">Цены</a></li>
+						<li><a href="">Блог</a></li>
+						<li><a href="">Партнеры</a></li>
+						<li><a href="">Поддержка</a></li>
+					</ul>
+
+					<ul class="navigation navigation-footer--two">
+						<li><a href="#">Партнерская программа</a></li>
+						<li><a href="#">Новости</a></li>
+						<li><a href="#">Политика конфиденциальности</a></li>
+						<li><a href="#">Пользовательское соглашение</a></li>
+					</ul>
+				</div>
+
+				<div class="footer-inner__right">
+					<form action="" class="footer-subscribe-form">
+						<div class="popup-input-item popup-input-item--mail">
+							<input type="text" placeholder="Введите почту" />
+						</div>
+						<input type="submit" class="popup-submit-btn btn" value="Подписаться" />
+					</form>
+				</div>
+			</div>
+		</footer>
+	</div>
+
+	<!-- Popups -->
+
+	<div id="popup-overlay" class="popup-overlay">
+		<!-- Login Popup -->
+		<div id="login-popup" class="popup">
+			<button class="close-popup-btn" type="button" aria-label="Закрыть попап"></button>
+
+			<img class="popup-logo" src="./img/logo.svg" alt="logo" />
+			<div class="popup-subtitle">Войдите или <a href="#" data-popup="registration-popup">зарегистрируйтесь</a></div>
+
+			<form class="popup-form" action="#">
+				<div class="popup-input-item popup-input-item--mail">
+					<input type="email" class="popup-input" placeholder="Почта" required />
+				</div>
+
+				<div class="popup-input-item popup-input-item--pass">
+					<input type="password" class="popup-input" placeholder="Пароль" required />
+				</div>
+
+				<div class="popup-input-item">
+					<label class="popup-checkbox-label">
+						<input type="checkbox" class="popup-checkbox" required />
+						<span class="custom-checkbox"></span>
+						<span class="checkbox-text"> Запомнить меня </span>
+					</label>
+
+					<a class="rm-link" href="#">Запомнить меня</a>
+				</div>
+
+				<div class="popup-input-item popup-input-item--submit">
+					<input type="submit" class="popup-submit-btn" value="Войти в систему" />
+				</div>
+			</form>
+		</div>
+		<!-- / Login Popup -->
+
+		<!-- Registration Popup -->
+		<div id="registration-popup" class="popup">
+			<button class="close-popup-btn" type="button" aria-label="Закрыть попап"></button>
+
+			<img class="popup-logo" src="./img/logo.svg" alt="logo" />
+			<div class="popup-subtitle"><a href="#" class="close-registration-popup" data-popup="login-popup">Войдите</a> или зарегистрируйтесь</div>
+
+			<form class="popup-form" action="#">
+				<div class="popup-input-item popup-input-item--name">
+					<input type="text" class="popup-input" placeholder="Имя" required />
+				</div>
+
+				<div class="popup-input-item popup-input-item--mail">
+					<input type="email" class="popup-input" placeholder="Почта" required />
+				</div>
+
+				<div class="popup-input-item popup-input-item--pass">
+					<input type="password" class="popup-input" placeholder="Пароль" required />
+				</div>
+
+				<div class="popup-input-item">
+					<label class="popup-checkbox-label">
+						<input type="checkbox" class="popup-checkbox" required />
+						<span class="custom-checkbox"></span>
+						<span class="checkbox-text"> Раз в месяц получать рассылку с обновлениями, чтобы не пропускать полезные функции </span>
+					</label>
+				</div>
+
+				<div class="popup-input-item popup-input-item--submit">
+					<input type="submit" class="popup-submit-btn" value="Зарегистрироваться" />
+				</div>
+
+				<div class="popup-agreement">Регистрируясь, вы принимаете <a href="#" data-popup="login-popup">публичную оферту</a></div>
+			</form>
+		</div>
+		<!-- / Registration Popup -->
+	</div>
+
+	<script src="./libs/swiper.min.js"></script>
+	<script src="./js/main.js"></script>
+</body>
+</html>

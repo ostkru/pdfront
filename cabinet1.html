@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Проверка ИНН</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #FF7D01;
+            --primary-hover: #E67000;
+            --text-color: #333333;
+            --light-gray: #F5F5F5;
+            --border-color: #E0E0E0;
+            --success-color: #4CAF50;
+            --error-color: #F44336;
+            --info-bg: #FBE3CC; /* Новый цвет для информационных блоков */
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+        }
+        
+        
+        .logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .nav-menu {
+            list-style: none;
+            padding: 0 15px;
+        }
+        
+        .nav-item {
+            margin-bottom: 5px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border-radius: 6px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 125, 1, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Основной контент */
+        .main-content {
+            padding: 30px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .header-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        /* Карточки */
+        .card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        /* Формы */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            transition: border 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--light-gray);
+        }
+        
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        /* Блок ИНН */
+        .inn-status {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            background: var(--light-gray);
+        }
+        
+        .status-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .status-verified {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-pending {
+            background-color: rgba(255, 125, 1, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .status-unverified {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--error-color);
+        }
+        
+        .inn-details {
+            flex-grow: 1;
+        }
+        
+        .inn-value {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .inn-status-text {
+            font-size: 14px;
+        }
+        
+        /* Блок генерации API ключа */
+        .api-key-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .api-key-input {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--info-bg); /* Изменено на новый цвет */
+            font-family: 'Courier New', monospace;
+            height: 46px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .api-key-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* Всплывающие сообщения */
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+            background-color: var(--info-bg); /* Изменено на новый цвет */
+            border-left: 4px solid var(--primary-color); /* Оранжевая полоса */
+        }
+        
+        .alert-info {
+            background-color: var(--info-bg); /* Изменено на новый цвет */
+            border-left: 4px solid var(--primary-color); /* Оранжевая полоса */
+        }
+        
+        .alert-error {
+            background-color: rgba(244, 67, 54, 0.1);
+            border-left: 4px solid var(--error-color);
+        }
+        
+        .alert-icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        
+        /* Процесс подтверждения */
+        .verification-steps {
+            margin-top: 25px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 25px;
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 25px;
+            align-items: flex-start;
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex-grow: 1;
+        }
+        
+        .step-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .payment-details {
+            background: var(--info-bg); /* Изменено на новый цвет */
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        /* Утилиты */
+        .d-flex {
+            display: flex;
+        }
+        
+        .align-center {
+            align-items: center;
+        }
+        
+        .justify-between {
+            justify-content: space-between;
+        }
+        
+        .mb-0 {
+            margin-bottom: 0 !important;
+        }
+        
+        .mt-20 {
+            margin-top: 20px;
+        }
+        
+        .text-success {
+            color: var(--success-color);
+        }
+        
+        .text-error {
+            color: var(--error-color);
+        }
+    </style>
+</head>
+<body>
+ 
+        
+        <!-- Основной контент -->
+        <div class="main-content">
+            <div class="header">
+                <div class="header-title">Моя компания</div>
+                <div class="user-info">
+                    <div class="user-avatar">ИИ</div>
+                    <div>Иван Иванов</div>
+                </div>
+            </div>
+            
+            <!-- Карточка информации о компании -->
+            <div class="card">
+                <div class="card-header">Основная информация</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Название компании</label>
+                        <input type="text" class="form-control" value="ООО 'Технологии Будущего'">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">ИНН компании</label>
+                        <input type="text" class="form-control" id="inn-input" value="7449006730">
+                    </div>
+                    
+                    <!-- Статус ИНН -->
+                    <div class="inn-status">
+                        <div class="status-icon status-unverified">❌</div>
+                        <div class="inn-details">
+                            <div class="inn-value">7449006730</div>
+                            <div class="inn-status-text">ИНН не подтвержден</div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" id="verify-inn-btn">Подтвердить</button>
+                    </div>
+                    
+                    <!-- Уведомление о проверке -->
+                    <div class="alert alert-info">
+                        <div class="alert-icon">ℹ️</div>
+                        <div>
+                            <strong>Требуется подтверждение ИНН</strong>
+                            <p>Для полного доступа к сервису необходимо подтвердить принадлежность компании. ИНН - важный идентификатор торговых процессов между компаниями. Мы должны быть уверены в представительстве данного предприятия на нашем ресурсе.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Процесс подтверждения -->
+                    <div class="verification-steps" id="verification-section" style="display: none;">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <div class="step-title">Отправка запроса на проверку</div>
+                                <p>Проверяем возможность подтверждения ИНН</p>
+                                <div class="d-flex align-center mt-20">
+                                    <div id="inn-check-status">Ожидание проверки...</div>
+                                    <div class="spinner" id="inn-check-spinner" style="margin-left: 10px;">🔄</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <div class="step-title">Оплата подтверждающего платежа</div>
+                                <p>Для подтверждения принадлежности компании, выполните платеж 100 ₽ с расчетного счета вашей компании</p>
+                                
+                                <div class="payment-details">
+                                    Банк получателя: АО "Тинькофф Банк"<br>
+                                    БИК: 044525974<br>
+                                    Счет получателя: 40817810560001234567<br>
+                                    ИНН получателя: 7710140679<br>
+                                    Назначение платежа: Подтверждение ИНН 7449006730<br>
+                                    Сумма: 100 ₽
+                                </div>
+                                
+                                <button class="btn btn-outline mt-20" id="copy-details-btn">Скопировать реквизиты</button>
+                            </div>
+                        </div>
+                        
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <div class="step-title">Завершение проверки</div>
+                                <p>После поступления платежа ваш ИНН будет автоматически подтвержден в течение 1 рабочего дня</p>
+                                <button class="btn btn-primary mt-20" id="check-payment-btn">Проверить оплату</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Карточка API доступа -->
+            <div class="card">
+                <div class="card-header">API доступ</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Ваш API ключ</label>
+                        
+                        <div class="api-key-container">
+                            <div class="api-key-input" id="api-key-value">eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbm4iOiI3NDQ5MDA2NzMwIiwiaWF0IjoxNjU4MDc1MDIyfQ.3wq7a4Z8X7Y2q2V1m1fL7e3dXq9e8v0r7t3y5u6i8o</div>
+                            <div class="api-key-actions">
+                                <button class="btn btn-outline" id="copy-api-btn">Копировать</button>
+                                <button class="btn btn-primary" id="generate-api-btn">Сгенерировать</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <div class="alert-icon">⚠️</div>
+                        <div>
+                            <strong>Безопасность API ключа</strong>
+                            <p>Никому не передавайте ваш API ключ. В случае компрометации немедленно сгенерируйте новый ключ.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы для работы с ИНН
+            const innInput = document.getElementById('inn-input');
+            const verifyBtn = document.getElementById('verify-inn-btn');
+            const verificationSection = document.getElementById('verification-section');
+            const innCheckStatus = document.getElementById('inn-check-status');
+            const innCheckSpinner = document.getElementById('inn-check-spinner');
+            const copyDetailsBtn = document.getElementById('copy-details-btn');
+            const checkPaymentBtn = document.getElementById('check-payment-btn');
+            
+            // Элементы для работы с API ключом
+            const apiKeyValue = document.getElementById('api-key-value');
+            const copyApiBtn = document.getElementById('copy-api-btn');
+            const generateApiBtn = document.getElementById('generate-api-btn');
+            
+            // Проверка ИНН
+            verifyBtn.addEventListener('click', function() {
+                const inn = innInput.value.trim();
+                
+                if (!inn || inn.length < 10) {
+                    alert('Пожалуйста, введите корректный ИНН');
+                    return;
+                }
+                
+                // Показываем процесс проверки
+                verificationSection.style.display = 'block';
+                innCheckStatus.textContent = 'Проверяем ИНН...';
+                innCheckSpinner.style.display = 'inline-block';
+                
+                // Имитация запроса к серверу
+                setTimeout(() => {
+                    // В реальности здесь будет fetch запрос к portaldata.ru/checkinn?inn=...
+                    // Для демонстрации используем случайный результат
+                    const isVerified = Math.random() > 0.5;
+                    
+                    innCheckSpinner.style.display = 'none';
+                    
+                    if (isVerified) {
+                        innCheckStatus.innerHTML = '<span class="text-success">ИНН подтвержден!</span>';
+                        verifyBtn.textContent = 'Подтверждено';
+                        verifyBtn.disabled = true;
+                    } else {
+                        innCheckStatus.innerHTML = '<span class="text-error">ИНН не подтвержден.</span>';
+                    }
+                }, 2000);
+            });
+            
+            // Копирование реквизитов
+            copyDetailsBtn.addEventListener('click', function() {
+                const details = `Банк получателя: АО "Тинькофф Банк"
+БИК: 044525974
+Счет получателя: 40817810560001234567
+ИНН получателя: 7710140679
+Назначение платежа: Подтверждение ИНН ${innInput.value}
+Сумма: 100 ₽`;
+                
+                navigator.clipboard.writeText(details).then(() => {
+                    copyDetailsBtn.textContent = 'Скопировано!';
+                    setTimeout(() => {
+                        copyDetailsBtn.textContent = 'Скопировать реквизиты';
+                    }, 2000);
+                });
+            });
+            
+            // Проверка оплаты
+            checkPaymentBtn.addEventListener('click', function() {
+                checkPaymentBtn.textContent = 'Проверяем...';
+                checkPaymentBtn.disabled = true;
+                
+                // Имитация проверки оплаты
+                setTimeout(() => {
+                    // В реальности здесь будет запрос к серверу
+                    const paymentReceived = Math.random() > 0.3;
+                    
+                    if (paymentReceived) {
+                        alert('Оплата подтверждена! ИНН успешно верифицирован.');
+                        verifyBtn.textContent = 'Подтверждено';
+                        verifyBtn.disabled = true;
+                        verificationSection.style.display = 'none';
+                        
+                        // Обновляем статус
+                        document.querySelector('.status-icon').className = 'status-icon status-verified';
+                        document.querySelector('.status-icon').innerHTML = '✓';
+                        document.querySelector('.inn-status-text').textContent = 'ИНН подтвержден';
+                        document.querySelector('.inn-status-text').className = 'inn-status-text text-success';
+                    } else {
+                        alert('Платеж еще не поступил. Пожалуйста, попробуйте позже.');
+                        checkPaymentBtn.textContent = 'Проверить оплату';
+                        checkPaymentBtn.disabled = false;
+                    }
+                }, 1500);
+            });
+            
+            // Работа с API ключом
+            copyApiBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(apiKeyValue.textContent).then(() => {
+                    copyApiBtn.textContent = 'Скопировано!';
+                    setTimeout(() => {
+                        copyApiBtn.textContent = 'Копировать';
+                    }, 2000);
+                });
+            });
+            
+            generateApiBtn.addEventListener('click', function() {
+                if (!confirm('При генерации нового ключа старый перестанет работать. Продолжить?')) {
+                    return;
+                }
+                
+                generateApiBtn.textContent = 'Генерация...';
+                generateApiBtn.disabled = true;
+                
+                // Имитация генерации нового ключа
+                setTimeout(() => {
+                    const newApiKey = generateApiKey();
+                    apiKeyValue.textContent = newApiKey;
+                    
+                    generateApiBtn.textContent = 'Сгенерировать';
+                    generateApiBtn.disabled = false;
+                    
+                    alert('Новый API ключ успешно сгенерирован!');
+                }, 1000);
+            });
+            
+            // Генерация случайного API ключа
+            function generateApiKey() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                const parts = [];
+                
+                for (let i = 0; i < 3; i++) {
+                    let part = '';
+                    for (let j = 0; j < 20; j++) {
+                        part += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
+                    parts.push(part);
+                }
+                
+                return parts.join('.');
+            }
+        });
+    </script>
+</body>
+</html>

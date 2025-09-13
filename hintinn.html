@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск компании по ИНН</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .suggestions {
+            position: absolute;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            z-index: 1000;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 4px;
+        }
+        .suggestion-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+        .suggestion-item:hover {
+            background-color: #f8f8f8;
+        }
+        .suggestion-highlight {
+            font-weight: 500;
+            color: #FF7D01;
+        }
+        .input-container {
+            position: relative;
+            width: 400px;
+            margin: 20px;
+        }
+        #inn-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            box-sizing: border-box;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border 0.2s;
+        }
+        #inn-input:focus {
+            border-color: #FF7D01;
+        }
+    </style>
+</head>
+<body>
+    <div class="input-container">
+        <input type="text" id="inn-input" placeholder="Введите ИНН компании">
+        <div id="suggestions" class="suggestions" style="display: none;"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('inn-input');
+            const suggestionsContainer = document.getElementById('suggestions');
+            let debounceTimer;
+            let lastRequestedQuery = '';
+            let currentRequest = null;
+
+            input.addEventListener('input', function(e) {
+                const query = e.target.value.trim();
+                
+                clearTimeout(debounceTimer);
+                
+                if (query.length === 0) {
+                    hideSuggestions();
+                    return;
+                }
+                
+                debounceTimer = setTimeout(() => {
+                    if (query.length >= 3) {
+                        fetchSuggestions(query);
+                    } else {
+                        hideSuggestions();
+                    }
+                }, 300);
+            });
+
+            input.addEventListener('focus', function() {
+                const query = input.value.trim();
+                if (query.length >= 3) {
+                    fetchSuggestions(query);
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                if (e.target !== input) {
+                    hideSuggestions();
+                }
+            });
+
+            function fetchSuggestions(query) {
+                if (currentRequest && lastRequestedQuery === query) {
+                    return;
+                }
+                
+                if (currentRequest) {
+                    currentRequest.abort();
+                }
+                
+                lastRequestedQuery = query;
+                
+                const url = `https://api.ostk.ru/hint/dada.php?q=${encodeURIComponent(query)}&type=company`;
+                
+                const controller = new AbortController();
+                currentRequest = controller;
+                
+                fetch(url, { signal: controller.signal })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        currentRequest = null;
+                        if (data.suggestions && data.suggestions.length > 0) {
+                            showSuggestions(data.suggestions, query);
+                        } else {
+                            hideSuggestions();
+                        }
+                    })
+                    .catch(error => {
+                        currentRequest = null;
+                        if (error.name !== 'AbortError') {
+                            console.error('Error fetching suggestions:', error);
+                        }
+                    });
+            }
+
+            function showSuggestions(suggestions, query) {
+                suggestionsContainer.innerHTML = '';
+                
+                suggestions.forEach(suggestion => {
+                    const item = document.createElement('div');
+                    item.className = 'suggestion-item';
+                    
+                    const inn = suggestion.data.inn || '';
+                    const name = suggestion.value || '';
+                    const displayText = `${inn} ${name}`;
+                    
+                    const highlightedText = displayText.replace(new RegExp(query, 'gi'), 
+                        match => `<span class="suggestion-highlight">${match}</span>`);
+                    
+                    item.innerHTML = highlightedText;
+                    
+                    item.addEventListener('click', function() {
+                        input.value = inn;
+                        hideSuggestions();
+                    });
+                    
+                    suggestionsContainer.appendChild(item);
+                });
+                
+                suggestionsContainer.style.display = 'block';
+            }
+
+            function hideSuggestions() {
+                suggestionsContainer.style.display = 'none';
+                suggestionsContainer.innerHTML = '';
+            }
+        });
+    </script>
+</body>
+</html>

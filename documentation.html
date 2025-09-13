@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Admin Panel</title>
+    <style>
+        :root {
+            --primary: #FF7D01;
+            --secondary: #FBE3CC;
+            --background: #f5f5f5;
+            --text: #333;
+            --light-text: #777;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            padding: 15px 0;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 24px;
+        }
+        
+        .upload-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .api-list {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .endpoint {
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid var(--primary);
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .endpoint:hover {
+            background-color: var(--secondary);
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        
+        .get { background-color: #61affe; color: white; }
+        .post { background-color: #49cc90; color: white; }
+        .put { background-color: #fca130; color: white; }
+        .delete { background-color: #f93e3e; color: white; }
+        
+        .request-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .required-indicator {
+            color: #e53935;
+            margin-left: 4px;
+        }
+        
+        .code-block {
+            background-color: var(--secondary);
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #e06d00;
+        }
+        
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .response-section {
+            margin-top: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .response-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .status-code {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .success { background-color: #49cc90; color: white; }
+        .error { background-color: #f93e3e; color: white; }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .path-display {
+            word-break: break-all;
+            font-size: 14px;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .operation-id {
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="header">
+                <h1>API Admin Panel</h1>
+            </div>
+            
+            <div class="upload-section">
+                <h2>Загрузите спецификацию Swagger</h2>
+                <div class="form-group">
+                    <label for="swagger-url">URL спецификации:</label>
+                    <input type="text" id="swagger-url" placeholder="https://example.com/swagger.json" value="https://portaldata.ru/api/v1/swagger.json">
+                </div>
+                <div class="form-group">
+                    <label>Или загрузите файл:</label>
+                    <input type="file" id="swagger-file" accept=".json">
+                </div>
+                <button class="btn" id="load-spec">Загрузить спецификацию</button>
+            </div>
+            
+            <div class="api-list">
+                <h2>Доступные методы API</h2>
+                <div id="endpoints-container">
+                    <p>Загрузите спецификацию для отображения методов</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="request-form">
+                <h2 id="selected-endpoint-title">Выберите метод API</h2>
+                <div id="request-form-container">
+                    <p>Выберите метод из списка слева для настройки запроса</p>
+                </div>
+            </div>
+            
+            <div class="response-section">
+                <div class="response-title">
+                    <h2>Ответ сервера</h2>
+                    <div class="status-code" id="status-code">Статус: -</div>
+                </div>
+                <div class="tabs">
+                    <div class="tab active" data-tab="body">Тело</div>
+                    <div class="tab" data-tab="headers">Заголовки</div>
+                    <div class="tab" data-tab="curl">cURL</div>
+                </div>
+                <div class="tab-content active" id="body-content">
+                    <div class="code-block" id="response-body">Ответ появится здесь после выполнения запроса</div>
+                </div>
+                <div class="tab-content" id="headers-content">
+                    <div class="code-block" id="response-headers">Заголовки ответа появятся здесь</div>
+                </div>
+                <div class="tab-content" id="curl-content">
+                    <div class="code-block" id="curl-command">cURL команда появится здесь</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Глобальные переменные
+        let currentSpec = null;
+        let currentEndpoint = null;
+        let baseUrl = '';
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            // Автоматически загружаем спецификацию при старте
+            setTimeout(() => {
+                document.getElementById('load-spec').click();
+            }, 500);
+        });
+
+        function setupEventListeners() {
+            // Загрузка спецификации
+            document.getElementById('load-spec').addEventListener('click', loadSwaggerSpec);
+            
+            // Обработка вкладок
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Удаляем активный класс у всех вкладок
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Добавляем активный класс текущей вкладке
+                    this.classList.add('active');
+                    const tabName = this.getAttribute('data-tab');
+                    document.getElementById(`${tabName}-content`).classList.add('active');
+                });
+            });
+            
+            // Обработка загрузки файла
+            document.getElementById('swagger-file').addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    document.getElementById('swagger-url').value = '';
+                }
+            });
+        }
+
+        function loadSwaggerSpec() {
+            const urlInput = document.getElementById('swagger-url').value;
+            const fileInput = document.getElementById('swagger-file');
+            
+            if (urlInput) {
+                // Используем прокси для обхода CORS
+                const corsProxy = "https://cors-anywhere.herokuapp.com/";
+                fetch(corsProxy + urlInput)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(spec => {
+                        currentSpec = spec;
+                        parseSwaggerSpec();
+                    })
+                    .catch(error => {
+                        alert('Ошибка загрузки спецификации: ' + error.message);
+                        console.error(error);
+                    });
+            } else if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    try {
+                        currentSpec = JSON.parse(e.target.result);
+                        parseSwaggerSpec();
+                    } catch (error) {
+                        alert('Ошибка парсинга файла: ' + error.message);
+                        console.error(error);
+                    }
+                };
+                
+                reader.readAsText(file);
+            } else {
+                alert('Пожалуйста, укажите URL или выберите файл спецификации');
+            }
+        }
+
+        function parseSwaggerSpec() {
+            if (!currentSpec) return;
+            
+            // Очищаем контейнер
+            const container = document.getElementById('endpoints-container');
+            container.innerHTML = '';
+            
+            if (!currentSpec.paths) {
+                alert('Спецификация не содержит информации о путях (paths)');
+                return;
+            }
+            
+            // Определяем базовый URL
+            if (currentSpec.servers && currentSpec.servers.length > 0) {
+                baseUrl = currentSpec.servers[0].url;
+            } else {
+                // Пытаемся определить базовый URL из первого пути
+                const firstPath = Object.keys(currentSpec.paths)[0];
+                if (firstPath) {
+                    const urlParts = firstPath.split('/');
+                    baseUrl = urlParts.slice(0, 3).join('/');
+                }
+            }
+            
+            // Рендерим эндпоинты
+            Object.entries(currentSpec.paths).forEach(([path, methods]) => {
+                Object.entries(methods).forEach(([method, details]) => {
+                    // Пропускаем нестандартные методы
+                    if (!['get', 'post', 'put', 'delete', 'patch'].includes(method)) return;
+                    
+                    const endpointElement = document.createElement('div');
+                    endpointElement.className = 'endpoint';
+                    
+                    // Краткий путь для отображения
+                    const displayPath = path.replace(baseUrl, '') || path;
+                    
+                    endpointElement.innerHTML = `
+                        <span class="method ${method}">${method.toUpperCase()}</span>
+                        <span class="path">${displayPath}</span>
+                        <div class="operation-id">${details.operationId || ''}</div>
+                        <div class="summary">${details.summary || details.description || ''}</div>
+                        <div class="path-display" title="${path}">${path}</div>
+                    `;
+                    
+                    endpointElement.addEventListener('click', () => {
+                        selectEndpoint(path, method, details);
+                    });
+                    
+                    container.appendChild(endpointElement);
+                });
+            });
+            
+            // Если есть методы, выбираем первый
+            const firstEndpoint = container.querySelector('.endpoint');
+            if (firstEndpoint) {
+                firstEndpoint.click();
+            }
+        }
+
+        function selectEndpoint(path, method, details) {
+            currentEndpoint = { path, method, details };
+            
+            // Обновляем заголовок
+            document.getElementById('selected-endpoint-title').innerHTML = `
+                <span class="method ${method}">${method.toUpperCase()}</span>
+                ${path.replace(baseUrl, '')}
+                <div class="operation-id">${details.operationId || ''}</div>
+                <div>${details.summary || details.description || ''}</div>
+            `;
+            
+            // Создаем форму для запроса
+            const formContainer = document.getElementById('request-form-container');
+            formContainer.innerHTML = '';
+            
+            // Добавляем поля для параметров
+            if (details.parameters) {
+                details.parameters.forEach(param => {
+                    const group = document.createElement('div');
+                    group.className = 'form-group';
+                    
+                    const requiredIndicator = param.required ? '<span class="required-indicator">*</span>' : '';
+                    
+                    group.innerHTML = `
+                        <label for="param-${param.name}">
+                            ${param.name} (${param.in}) ${requiredIndicator}
+                        </label>
+                        <input type="text" 
+                               id="param-${param.name}" 
+                               placeholder="${param.description || ''}" 
+                               value="${param.schema?.default || ''}">
+                        <small>${param.description || ''}</small>
+                    `;
+                    
+                    formContainer.appendChild(group);
+                });
+            } else {
+                const noParams = document.createElement('p');
+                noParams.textContent = 'Для этого метода не требуется параметров';
+                formContainer.appendChild(noParams);
+            }
+            
+            // Добавляем кнопку отправки
+            const sendButton = document.createElement('button');
+            sendButton.className = 'btn';
+            sendButton.textContent = 'Отправить запрос';
+            sendButton.addEventListener('click', sendRequest);
+            
+            formContainer.appendChild(sendButton);
+        }
+
+        async function sendRequest() {
+            if (!currentEndpoint) return;
+            
+            const { path, method, details } = currentEndpoint;
+            let url = path;
+            
+            // Собираем параметры пути
+            const pathParams = {};
+            if (details.parameters) {
+                details.parameters
+                    .filter(p => p.in === 'path')
+                    .forEach(param => {
+                        const value = document.getElementById(`param-${param.name}`).value;
+                        if (value) {
+                            pathParams[param.name] = value;
+                        } else if (param.required) {
+                            alert(`Параметр ${param.name} обязателен!`);
+                            throw new Error(`Required parameter ${param.name} is missing`);
+                        }
+                    });
+                
+                // Заменяем параметры пути в URL
+                for (const [key, value] of Object.entries(pathParams)) {
+                    url = url.replace(`{${key}}`, encodeURIComponent(value));
+                }
+            }
+            
+            // Собираем параметры запроса
+            const queryParams = {};
+            if (details.parameters) {
+                details.parameters
+                    .filter(p => p.in === 'query')
+                    .forEach(param => {
+                        const value = document.getElementById(`param-${param.name}`).value;
+                        if (value) {
+                            queryParams[param.name] = value;
+                        }
+                    });
+            }
+            
+            // Добавляем параметры запроса к URL
+            const queryString = new URLSearchParams(queryParams).toString();
+            if (queryString) {
+                url += (url.includes('?') ? '&' : '?') + queryString;
+            }
+            
+            // Формируем cURL команду
+            generateCurlCommand(method, url);
+            
+            // Показываем статус загрузки
+            document.getElementById('status-code').textContent = 'Статус: Загрузка...';
+            document.getElementById('status-code').className = 'status-code';
+            document.getElementById('response-body').textContent = 'Отправка запроса...';
+            
+            try {
+                // Отправляем запрос
+                const options = {
+                    method: method.toUpperCase(),
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                };
+                
+                const response = await fetch(url, options);
+                
+                // Обновляем статус
+                const statusCodeEl = document.getElementById('status-code');
+                statusCodeEl.textContent = `Статус: ${response.status} ${response.statusText}`;
+                statusCodeEl.className = `status-code ${response.ok ? 'success' : 'error'}`;
+                
+                // Получаем заголовки
+                const headers = [...response.headers.entries()];
+                document.getElementById('response-headers').textContent = 
+                    headers.map(([key, value]) => `${key}: ${value}`).join('\n');
+                
+                // Получаем тело ответа как текст
+                const textData = await response.text();
+                
+                // Пытаемся распарсить текст как JSON
+                try {
+                    const jsonData = JSON.parse(textData);
+                    document.getElementById('response-body').textContent = 
+                        JSON.stringify(jsonData, null, 2);
+                } catch {
+                    document.getElementById('response-body').textContent = textData;
+                }
+            } catch (error) {
+                document.getElementById('status-code').textContent = `Ошибка: ${error.message}`;
+                document.getElementById('status-code').className = 'status-code error';
+                document.getElementById('response-body').textContent = error.stack || error.message;
+            }
+        }
+
+        function generateCurlCommand(method, url) {
+            let curl = `curl -X ${method.toUpperCase()} "${url}" \\\n`;
+            curl += `   -H "Accept: application/json"`;
+            
+            document.getElementById('curl-command').textContent = curl;
+        }
+    </script>
+</body>
+</html>

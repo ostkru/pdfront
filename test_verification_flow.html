@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест полного flow верификации</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .step { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Тест полного flow верификации</h1>
+    
+    <div class="step info">
+        <h3>Шаг 1: Проверка текущего состояния</h3>
+        <p>Проверим, есть ли пользователь в localStorage и его статус верификации</p>
+        <button onclick="checkCurrentState()">Проверить состояние</button>
+        <pre id="current-state">Нажмите кнопку для проверки</pre>
+    </div>
+
+    <div class="step info">
+        <h3>Шаг 2: Создание нового пользователя</h3>
+        <p>Создадим нового пользователя для тестирования</p>
+        <button onclick="createNewUser()">Создать пользователя</button>
+        <pre id="create-result">Нажмите кнопку для создания</pre>
+    </div>
+
+    <div class="step info">
+        <h3>Шаг 3: Верификация email</h3>
+        <p>Протестируем верификацию с полученным токеном</p>
+        <input type="text" id="verification-token" placeholder="Вставьте токен верификации" style="width: 400px;">
+        <button onclick="verifyEmail()">Верифицировать email</button>
+        <pre id="verify-result">Вставьте токен и нажмите кнопку</pre>
+    </div>
+
+    <div class="step info">
+        <h3>Шаг 4: Проверка обновленного состояния</h3>
+        <p>Проверим, изменился ли статус пользователя</p>
+        <button onclick="checkUpdatedState()">Проверить обновленное состояние</button>
+        <pre id="updated-state">Нажмите кнопку для проверки</pre>
+    </div>
+
+    <div class="step info">
+        <h3>Шаг 5: Тест входа в личный кабинет</h3>
+        <p>Попробуем войти в личный кабинет</p>
+        <button onclick="testCabinetAccess()">Тест доступа к кабинету</button>
+        <pre id="cabinet-result">Нажмите кнопку для теста</pre>
+    </div>
+
+    <script>
+        const API_ENDPOINT = 'https://portaldata.ru/api/v1';
+
+        // Шаг 1: Проверка текущего состояния
+        async function checkCurrentState() {
+            const result = {
+                localStorage: {
+                    token: localStorage.getItem('token'),
+                    user: localStorage.getItem('user')
+                },
+                window: {
+                    AUTH_TOKEN: window.AUTH_TOKEN,
+                    user: window.user
+                }
+            };
+            
+            document.getElementById('current-state').textContent = JSON.stringify(result, null, 2);
+        }
+
+        // Шаг 2: Создание нового пользователя
+        async function createNewUser() {
+            try {
+                const email = `test_verification_${Date.now()}@example.com`;
+                const userData = {
+                    email: email,
+                    password: 'test123456',
+                    name: 'Test Verification User',
+                    inn: '1234567890'
+                };
+
+                const response = await fetch(`${API_ENDPOINT}/user/registration`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('create-result').textContent = 
+                        `✅ Пользователь создан!\nEmail: ${email}\nID: ${data.item.id}\n\nТеперь проверьте почту и вставьте токен верификации в поле выше.`;
+                } else {
+                    document.getElementById('create-result').textContent = 
+                        `❌ Ошибка создания: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                document.getElementById('create-result').textContent = 
+                    `🚨 Ошибка: ${error.message}`;
+            }
+        }
+
+        // Шаг 3: Верификация email
+        async function verifyEmail() {
+            const token = document.getElementById('verification-token').value.trim();
+            if (!token) {
+                document.getElementById('verify-result').textContent = '❌ Введите токен верификации';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_ENDPOINT}/user/verify`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ token })
+                });
+
+                const data = await response.json();
+                
+                if (data.code === 200) {
+                    document.getElementById('verify-result').textContent = 
+                        `✅ Email успешно подтвержден!\nОтвет: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    document.getElementById('verify-result').textContent = 
+                        `❌ Ошибка верификации: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                document.getElementById('verify-result').textContent = 
+                    `🚨 Ошибка: ${error.message}`;
+            }
+        }
+
+        // Шаг 4: Проверка обновленного состояния
+        async function checkUpdatedState() {
+            try {
+                // Попробуем получить данные пользователя
+                const response = await fetch(`${API_ENDPOINT}/user/data`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                const result = {
+                    localStorage: {
+                        token: localStorage.getItem('token'),
+                        user: localStorage.getItem('user')
+                    },
+                    window: {
+                        AUTH_TOKEN: window.AUTH_TOKEN,
+                        user: window.user
+                    },
+                    apiResponse: data
+                };
+                
+                document.getElementById('updated-state').textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                document.getElementById('updated-state').textContent = 
+                    `🚨 Ошибка: ${error.message}`;
+            }
+        }
+
+        // Шаг 5: Тест входа в личный кабинет
+        async function testCabinetAccess() {
+            try {
+                // Попробуем войти с созданными данными
+                const email = document.getElementById('verification-token').value.trim() ? 
+                    'test_verification@example.com' : 'test_debug@example.com';
+                
+                const response = await fetch(`${API_ENDPOINT}/authentication_token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: 'test123456'
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.token) {
+                    // Сохраняем токен
+                    localStorage.setItem('token', data.token);
+                    window.AUTH_TOKEN = data.token;
+                    
+                    // Теперь пробуем получить данные пользователя
+                    const userResponse = await fetch(`${API_ENDPOINT}/user/data`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${data.token}`
+                        }
+                    });
+
+                    const userData = await userResponse.json();
+                    
+                    const result = {
+                        login: data,
+                        userData: userData,
+                        localStorage: {
+                            token: localStorage.getItem('token')
+                        }
+                    };
+                    
+                    document.getElementById('cabinet-result').textContent = 
+                        `✅ Вход выполнен!\n${JSON.stringify(result, null, 2)}`;
+                } else {
+                    document.getElementById('cabinet-result').textContent = 
+                        `❌ Ошибка входа: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                document.getElementById('cabinet-result').textContent = 
+                    `🚨 Ошибка: ${error.message}`;
+            }
+        }
+
+        // Автоматически проверяем состояние при загрузке
+        window.addEventListener('load', checkCurrentState);
+    </script>
+</body>
+</html>
